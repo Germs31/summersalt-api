@@ -15,7 +15,6 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 export const loginUser = async (req: Request, res: Response) => {
-    console.log(req.body)
     try {
         const foundUser = await User.findOne({username: req.body.username})
         if(foundUser) {

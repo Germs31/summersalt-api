@@ -4,6 +4,7 @@ import session from 'express-session'
 import mongoose, { ConnectOptions } from 'mongoose';
 import { config } from './config/config';
 import Logging from './library/logging';
+import userRoute from './routes/userRoute'
 
 const router = express()
 
@@ -64,6 +65,9 @@ const startServer = () => {
 
     // Health check
     router.get('/ping', (req: Request, res: Response, next: NextFunction) => res.status(200).json({ message: 'pong' }));
+
+    // Routes
+    router.use('/api/user', userRoute)
 
     // Error handeling checking if route exist
     router.use((req: Request, res: Response, next: NextFunction) => {
