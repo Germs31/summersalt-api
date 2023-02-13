@@ -1,5 +1,6 @@
 import express,{ NextFunction, Request, Response } from 'express';
 import http from 'http';
+import session from 'express-session'
 import mongoose, { ConnectOptions } from 'mongoose';
 import { config } from './config/config';
 import Logging from './library/logging';
@@ -36,6 +37,30 @@ const startServer = () => {
     // Middleware
     router.use(express.urlencoded({ extended: true }));
     router.use(express.json());
+    router.use(session({
+        secret: config.session.pwrd, // Use a secret key to sign the session ID cookie
+        resave: false,
+        saveUninitialized: true,
+        // store: new MongoStore({
+        //     url: 'mongodb://localhost/session-store'
+        // }),
+        cookie: {
+          secure: false, // Set to true for secure (HTTPS) connections
+          maxAge: 1000 * 60 * 60 * 24 // 1 day
+        }
+      }));
+
+
+    // Access policy
+    router.use(function (req: Request, res: Response, next: NextFunction) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requesterd-With, Content-Type, Accept , Authorization');
+        if (req.method == 'OPTIONS') {
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+            return res.status(200).json({});
+        }
+        next();
+    });
 
     // Health check
     router.get('/ping', (req: Request, res: Response, next: NextFunction) => res.status(200).json({ message: 'pong' }));
